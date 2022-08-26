@@ -19,9 +19,42 @@ def create_blog(request: BlogCreate, db: Session = Depends(get_db)):
     db.refresh(new_blog)
     return new_blog
 
-@router.get("all")
+@router.get("/all")
 def get_blog(db: Session = Depends(get_db)):
     return db.query(Blogs).all()
+
+@router.get("/blog/{obj_id}")
+def get_blog(obj_id:int, db: Session = Depends(get_db)):
+    result = db.query(Blogs).get(obj_id)
+    return result
+
+@router.put("/blog/{obj_id}")
+def update_blog(obj_id:int, db: Session = Depends(get_db)):
+    result = db.query(Blogs).get(obj_id)
+    if result != None:
+        result.published=True
+        db.commit()
+        db.refresh(result)
+    return result
+
+@router.put("/blog/message/{obj_id}")
+def update_blog(message:str, obj_id:int, db: Session = Depends(get_db)):
+    result = db.query(Blogs).get(obj_id)
+    if result != None:
+        result.message=message
+        db.commit()
+        db.refresh(result)
+    return result
+
+
+@router.delete("/blog/{obj_id}")
+def update_blog(obj_id:int, db: Session = Depends(get_db)):
+    result = db.query(Blogs).get(obj_id)
+    if result != None:
+        db.delete(result)
+        db.commit()
+    return {"message": "item deleted"}
+
 
 @router.post("/math")
 def math_operation(item: Items) -> int:
